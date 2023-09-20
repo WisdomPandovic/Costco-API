@@ -134,13 +134,14 @@ function verifyToken(req, res, next) {
   }
 
   jwt.verify(token, 'p3A#8WmTbD$9S@yK!qXg*1&r^7z%j@2L', (err, decoded) => {
-
+ console.log(token)
     if (err) {
       if (err.name === 'TokenExpiredError') {
         const expirationTime = new Date(decoded.exp * 1000);
         console.log('Token has expired. Expiration time:', expirationTime);
         return res.status(401).json({ message: 'Token has expired' });
       }
+      console.log(err.message)
       return res.status(401).json({ message: 'Failed to authenticate token' });
     }
 

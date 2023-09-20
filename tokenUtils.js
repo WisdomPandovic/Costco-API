@@ -17,7 +17,9 @@ function generateToken(user) {
   // const options = { expiresIn: null }; // This means the token will not expire
 
 
-  return jwt.sign(payload, 'p3A#8WmTbD$9S@yK!qXg*1&r^7z%j@2L', options);
+  const signToken = jwt.sign(payload, 'p3A#8WmTbD$9S@yK!qXg*1&r^7z%j@2L', options);
+  console.log(signToken)
+  return signToken
 
 }
 

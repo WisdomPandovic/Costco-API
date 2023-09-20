@@ -1,6 +1,7 @@
 const User = require('../../models/user')
 const bcrypt = require('bcryptjs')
 const Product=require("../../models/product");
+const Notification =require("../../models/notification");
 const { verifyToken, verifyAdminToken } = require('../../middleware');
 const generateToken = require('../../tokenUtils');
 
@@ -44,6 +45,13 @@ const routes = function(app){
             })
     
 			await user.save()
+
+			// Generate a notification
+            const notification = new Notification({
+                message: `Admin ${req.user.name} created a new user: ${user.name}`,
+                type: 'user_creation',
+            });
+            await notification.save();
            
                 res.json(user)
 		}catch(err){
@@ -64,6 +72,14 @@ const routes = function(app){
             })
     
 			await user.save()
+
+			// Generate a notification
+            const notification = new Notification({
+				message: `Admin created a new admin user: ${user.name}`,
+				// message: `Admin ${adminName} created a new admin user: ${user.name}`,
+				type: 'user_creation',
+			});
+			await notification.save();
            
                 res.json(user)
 		}catch(err){
@@ -190,6 +206,48 @@ const routes = function(app){
 		}
 	  });
 	  
+
+	//   app.post("/admin-users", async function(req,res){
+		
+    //     try{
+	// 		if (req.user && req.user.role === 'admin') {
+	// 			// ...
+	// 		  } else {
+	// 			res.status(403).json({ error: 'Unauthorized' });
+	// 		  }
+    //         // Check if authenticated user is an admin
+    //         if (req.user.role === 'admin') {
+    //             const {name, email, phoneNumber, password, membershipNumber, role,} = req.body;
+    //             const user = new User({
+    //                 name,
+    //                 email: email.toLowerCase(),
+    //                 phoneNumber,
+    //                 password,
+    //                 membershipNumber,
+    //                 role: "admin", 
+    //             });
+            
+    //             await user.save();
+            
+    //             // Retrieve admin's name from the database
+    //             const admin = await User.findOne({ role: 'admin' });
+    //             const adminName = admin ? admin.name : 'Admin';
+            
+    //             // Generate a notification
+    //             const notification = new Notification({
+    //                 message: `Admin ${adminName} created a new admin user: ${user.name}`,
+    //                 type: 'user_creation',
+    //             });
+    //             await notification.save();
+               
+    //             res.json(user);
+    //         } else {
+    //             res.status(403).json({ error: 'Unauthorized' });
+    //         }
+    //     } catch(err){
+    //         res.status(500).send(err.message);
+    //     }
+    // });
 }
 
 module.exports = routes

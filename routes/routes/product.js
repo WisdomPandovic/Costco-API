@@ -127,7 +127,7 @@ const routes = function (app) {
 		try {
 			// Verify the token
 			const token = req.headers['authorization'];
-			jwt.verify(token, 'dfhjhb68927yuwhb7834382fcg783', async (err, decoded) => {
+			jwt.verify(token, 'p3A#8WmTbD$9S@yK!qXg*1&r^7z%j@2L', async (err, decoded) => {
 				if (err) {
 					return res.status(401).json({ message: 'Failed to authenticate token' });
 				}
