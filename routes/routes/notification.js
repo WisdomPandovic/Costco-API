@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const Product=require("../../models/product");
 
 const routes = function(app){
+	// This route retrieves a list of notifications, sorted by timestamp in descending order (newest first).
 	app.get('/api/notifications', async (req, res) => {
 		try {
 		  const notifications = await Notification.find().sort({ timestamp: -1 });

@@ -8,6 +8,7 @@ const User=require("../../models/user");
 const Category=require("../../models/category");
 const { verifyToken, verifyAdminToken } = require('../../middleware');
 const jwt = require('jsonwebtoken');
+const Notification =require("../../models/notification");
 
 const storage = multer.diskStorage({
     destination: (reg, file, cb)=> {
@@ -23,6 +24,7 @@ const storage = multer.diskStorage({
 const productimage = multer({storage: storage});
 
 const routes = function (app) {
+	// This routes retrieves a list of products with their associated category and user information.
     app.get('/products', async function(req,res){
 		try{
 			let product = await Product.find().populate("category").populate('user').lean();
@@ -33,6 +35,7 @@ const routes = function (app) {
 		}
 	});
 
+	// This routes retrieves a specific product by its unique ID, along with its associated category and user information.
 	app.get('/product/:id', async function(req,res){
 		try{
 			let {id} = req.params;
@@ -50,36 +53,45 @@ const routes = function (app) {
 		}
 	});
 
-    // app.post('/product', productimage.any(), async function(req, res) {
-    // try {
-    //     console.log('received request', req.body);
-    //     console.log('received files', req.files);
+	// This route creates a new product with the provided information, including an image. Also associates the product with a user and a category. Generates a notification indicating that a new product has been created.
+    app.post('/product', productimage.any(), async function(req, res) {
+    try {
+        console.log('received request', req.body);
+        console.log('received files', req.files);
 
-    //     const { name, description, category, price, quantity, user } = req.body;
+        const { name, description, category, price, quantity, user } = req.body;
 
-    //     let product = new Product({
-    //         name,
-    //         description,
-    //         category,
-	// 		price,
-	// 		quantity,
-    //         user: user, 
-    //         image: FILE_PATH + req.files[0].filename, 
-    //     });
+        let product = new Product({
+            name,
+            description,
+            category,
+			price,
+			quantity,
+            user, 
+            image: FILE_PATH + req.files[0].filename, 
+        });
 
-    //     console.log('product created:', product);
-    //     await product.save();
+        console.log('product created:', product);
+        await product.save();
 
-    //     await User.findByIdAndUpdate(user, { $push: { product: product._id } });
+		// Generate a notification
+		const notification = new Notification({
+			message: `Admin created a new product: ${product.name}`,
+			type: 'user_creation',
+		});
+		await notification.save();
 
-	// 	await Category.findByIdAndUpdate(category, { $push: { product: product._id } });
+        await User.findByIdAndUpdate(user, { $push: { product: product._id } });
 
-    //     res.json({ msg: "product created", code: 200 });
-    // } catch (err) {
-    //     res.status(500).send(err.message);
-    // }
-    // });
+		await Category.findByIdAndUpdate(category, { $push: { product: product._id } });
+
+        res.json({ msg: "product created", code: 200 });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+    });
 	
+	// This route updates an existing product's information based on its unique ID.
 	app.put('/product/:id', async function(req,res){
 		try{
 			let {id} = req.params
@@ -100,6 +112,7 @@ const routes = function (app) {
 		}
 	});
     
+	// Deletes a product with the specified ID. Also generates a notification indicating that a product has been deleted.
     app.delete('/product/:id', async function(req,res){
 		try{
 			let {id} = req.params
@@ -113,6 +126,7 @@ const routes = function (app) {
 		}
 	});
 	  
+	// This route Retrieves a list of products belonging to a specific category based on the category's unique ID.
 	app.get('/product/category/:categoryId', async (req, res) => {
 		try {
 		  const categoryId = req.params.categoryId;
@@ -122,44 +136,6 @@ const routes = function (app) {
 		  res.status(500).json({ error: 'Internal server error' });
 		}
 	  });	
-
-	  app.post('/product', verifyToken, verifyAdminToken, productimage.any(), async function(req, res) {
-		try {
-			// Verify the token
-			const token = req.headers['authorization'];
-			jwt.verify(token, 'p3A#8WmTbD$9S@yK!qXg*1&r^7z%j@2L', async (err, decoded) => {
-				if (err) {
-					return res.status(401).json({ message: 'Failed to authenticate token' });
-				}
-	
-				const { name, description, category, price, quantity } = req.body;
-				const user = decoded.id; // Extract userID from the token
-	
-				let product = new Product({
-					name,
-					description,
-					category,
-					price,
-					quantity,
-					user,
-					image: FILE_PATH + req.files[0].filename,
-				});
-	
-				console.log('product created:', product);
-				await product.save();
-	
-				await User.findByIdAndUpdate(user, { $push: { product: product._id } });
-	
-				await Category.findByIdAndUpdate(category, { $push: { product: product._id } });
-	
-				res.json({ msg: "product created", code: 200 });
-			});
-		} catch (err) {
-			res.status(500).send(err.message);
-		}
-	});
-	
-	
 }
 
 module.exports = routes

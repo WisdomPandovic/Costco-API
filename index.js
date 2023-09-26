@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require("cors");
 const app = express()
 
+const bodyParser = require('body-parser');
+
 const PORT  =process.env.PORT || 3008;
 const DB_URL = "mongodb://127.0.0.1:27017/costco-api"
 const routes = require('./routes/app')

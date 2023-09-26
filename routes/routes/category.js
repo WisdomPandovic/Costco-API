@@ -5,6 +5,7 @@ const PORT = 3008;
 const FILE_PATH  = `http://127.0.0.1:${PORT}/productimage/`;
 
 const routes = function (app) {
+	// This route retrieves a list of categories.
     app.get('/category', async function(req,res){
 		try{
 			let category = await Category.find().lean()
@@ -15,6 +16,7 @@ const routes = function (app) {
 		}
 	});
 	  
+	// This route retrieves a specific category by its unique ID, along with the products associated with it.
 	app.get('/category/:id', async function(req,res){
 		try{
 		 let {id} = req.params
@@ -39,6 +41,7 @@ const routes = function (app) {
 		}
 	 })
 
+	 // This route updates an existing category's information based on its unique ID.
 	app.put('/category/:id', async function(req,res){
 		try{
 			let {id} = req.params
@@ -59,6 +62,7 @@ const routes = function (app) {
 		}
 	});
     
+	// Deletes a category with the specified ID.
     app.delete('/category/:id', async function(req,res){
 		try{
 			let {id} = req.params
@@ -74,6 +78,7 @@ const routes = function (app) {
 			}
 	});
 
+	// Creates a new category with the provided information.
 	app.post('/category', async function(req,res){
 		try{
 			let category = new Category(req.body)

@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs')
 const Product=require("../../models/product");
 
 const routes = function(app){
-
+// This route adds a product to the shopping cart. Saves information such as product ID, name, quantity, total price, unit price, user, and user name to the cart.
 app.post('/add-to-cart', async (req, res) => {
   const { productId,  productName, quantity, totalPrice, Price, user, userName, qty } = req.body;
 
@@ -27,6 +27,7 @@ app.post('/add-to-cart', async (req, res) => {
   }
 });
 
+// This route retrieves a list of items in the shopping cart.
 app.get('/get-cart-items', async (req, res) => {
   try {
     const cartItems = await Cart.find(); 
@@ -36,6 +37,7 @@ app.get('/get-cart-items', async (req, res) => {
   }
 });
 
+// This route remove a specific item from the shopping cart based on the product ID.
 app.delete('/remove-from-cart/:productId', async (req, res) => {
   const productId = req.params.productId;
 
