@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET;
 
 function generateToken(user) {
   const payload = {
@@ -17,7 +19,7 @@ function generateToken(user) {
   // const options = { expiresIn: null }; // This means the token will not expire
 
 
-  const signToken = jwt.sign(payload, 'p3A#8WmTbD$9S@yK!qXg*1&r^7z%j@2L', options);
+  const signToken = jwt.sign(payload, JWT_SECRET, options);
   console.log(signToken)
   return signToken
 

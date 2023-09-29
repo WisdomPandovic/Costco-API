@@ -4,6 +4,9 @@ const Product=require("../../models/product");
 const Notification =require("../../models/notification");
 const { verifyToken, verifyAdminToken } = require('../../middleware');
 const generateToken = require('../../tokenUtils');
+const  generateResetToken = require('../../resetUtils').generateResetToken;
+const  sendResetEmail = require('../../resetUtils').sendResetEmail;
+require('dotenv').config();
 
 const multer = require("multer");
 const PORT = 3008;
@@ -262,6 +265,31 @@ const routes = function(app){
 			res.status(500).send(err.message);
 		}
 	});
+
+
+	
+	
+		// Route for handling "forgot password" requests
+		app.post("/reset-password", async function(req, res){
+			try {
+				const { email } = req.body;
+				const user = await User.findOne({ email });
+	
+				if (!user) {
+					return res.status(404).json({ msg: "User not found", code: 404 });
+				}
+	
+				// Generate a reset token and store it (you need to implement this function)
+				const resetToken = generateResetToken(email);
+	
+				// Send an email with the reset link (you need to implement this function)
+				await sendResetEmail(email, resetToken);
+	
+				res.json({ msg: "Password reset email sent successfully" });
+			} catch (err) {
+				res.status(500).send(err.message);
+			}
+		});
 }
 
 module.exports = routes
